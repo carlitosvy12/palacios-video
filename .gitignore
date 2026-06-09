@@ -15,6 +15,7 @@ venv/
 *_youtube.txt
 *_subtitulos.ass
 *_subtitulos.srt
+web/stripe-links.js
 
 # Modelos descargados por faster-whisper
 models/

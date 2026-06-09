@@ -87,6 +87,11 @@
         color: #fff;
       }
 
+      .btn.disabled {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
       .hero {
         min-height: 78vh;
         display: grid;
@@ -211,6 +216,11 @@
         margin: 18px 0 6px;
       }
 
+      .plan-action {
+        margin-top: 18px;
+        width: 100%;
+      }
+
       footer {
         padding: 32px 0 52px;
         color: var(--muted);
@@ -306,16 +316,19 @@
               <h3>Creator</h3>
               <div class="price">29 EUR/mes</div>
               <p>Para creadores individuales que editan videos cortos cada semana.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="creator">Elegir Creator</a>
             </article>
             <article class="card">
               <h3>Pro</h3>
               <div class="price">79 EUR/mes</div>
               <p>Mas horas, metadata y flujo pensado para publicar de forma constante.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="pro">Elegir Pro</a>
             </article>
             <article class="card">
               <h3>Agencia</h3>
               <div class="price">199 EUR/mes</div>
               <p>Para equipos que procesan contenido de varios clientes.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="agencia">Elegir Agencia</a>
             </article>
           </div>
         </div>
@@ -325,5 +338,24 @@
     <footer id="contacto">
       <div class="shell">Palacios Video. MVP comercial en construccion.</div>
     </footer>
+    <script src="/stripe-links.js"></script>
+    <script>
+      const stripeLinks = window.PALACIOS_STRIPE_LINKS || {};
+
+      document.querySelectorAll("[data-stripe-plan]").forEach((button) => {
+        const plan = button.dataset.stripePlan;
+        const url = stripeLinks[plan];
+
+        if (url) {
+          button.href = url;
+          button.rel = "noopener";
+        } else {
+          button.href = "#planes";
+          button.classList.add("disabled");
+          button.setAttribute("aria-disabled", "true");
+          button.title = "Payment Link pendiente de configurar en Render";
+        }
+      });
+    </script>
   </body>
 </html>

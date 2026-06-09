@@ -72,3 +72,97 @@ Si decides crear el sitio manualmente en vez de usar Blueprint:
 
 - Yo no puedo verificar el despliegue real porque depende de tu cuenta de
   Render y del repo remoto conectado.
+
+## Fase 2 - Pagos con Stripe Payment Links
+
+### Que se ha preparado en el repo
+
+- Los botones de `Creator`, `Pro` y `Agencia` ya leen sus URLs desde:
+  - `STRIPE_LINK_CREATOR`
+  - `STRIPE_LINK_PRO`
+  - `STRIPE_LINK_AGENCIA`
+- `web/build-stripe-links.js` genera `web/stripe-links.js` durante el build de
+  Render.
+- `render.yaml` ejecuta `node web/build-stripe-links.js` antes de publicar la
+  carpeta `web`.
+
+### Cuenta necesaria
+
+1. Cuenta de Stripe: https://dashboard.stripe.com
+2. La landing ya desplegada en Render.
+
+### Crear los productos en Stripe
+
+1. Entra en https://dashboard.stripe.com
+2. Inicia sesion.
+3. En el menu lateral, entra en `Product catalog`.
+4. Pulsa `Add product`.
+5. Crea el producto `Palacios Video Creator`:
+   - `Name`: `Palacios Video Creator`
+   - `Pricing model`: `Standard pricing`
+   - `Price`: `29`
+   - `Currency`: `EUR`
+   - `Recurring`: mensual
+6. Pulsa `Save product`.
+7. Repite el proceso para:
+   - `Palacios Video Pro`, `79 EUR`, mensual.
+   - `Palacios Video Agencia`, `199 EUR`, mensual.
+
+### Crear Payment Links
+
+Para cada producto:
+
+1. En Stripe, entra en `Payment Links`.
+2. Pulsa `New`.
+3. Selecciona el producto correspondiente.
+4. Cantidad: `1`.
+5. Asegurate de que el precio es mensual recurrente.
+6. En `After payment`, deja una pagina de confirmacion simple por ahora.
+7. Pulsa `Create link`.
+8. Copia el enlace generado. Sera parecido a:
+   `https://buy.stripe.com/...`
+
+Guarda cada enlace con esta correspondencia:
+
+- Creator -> `STRIPE_LINK_CREATOR`
+- Pro -> `STRIPE_LINK_PRO`
+- Agencia -> `STRIPE_LINK_AGENCIA`
+
+### Meter las variables en Render
+
+1. Entra en https://dashboard.render.com
+2. Abre el servicio `palacios-video-landing`.
+3. En el menu del servicio, entra en `Environment`.
+4. Pulsa `Add Environment Variable`.
+5. Anade:
+   - `Key`: `STRIPE_LINK_CREATOR`
+   - `Value`: pega el Payment Link de Creator.
+6. Pulsa otra vez `Add Environment Variable`.
+7. Anade:
+   - `Key`: `STRIPE_LINK_PRO`
+   - `Value`: pega el Payment Link de Pro.
+8. Pulsa otra vez `Add Environment Variable`.
+9. Anade:
+   - `Key`: `STRIPE_LINK_AGENCIA`
+   - `Value`: pega el Payment Link de Agencia.
+10. Guarda los cambios.
+
+### Redesplegar en Render
+
+1. En el servicio de Render, entra en `Manual Deploy`.
+2. Pulsa `Deploy latest commit`.
+3. Espera a que termine el build.
+4. Abre la URL publica de la landing.
+5. Baja a `Planes mensuales`.
+6. Pulsa cada boton:
+   - `Elegir Creator`
+   - `Elegir Pro`
+   - `Elegir Agencia`
+7. Cada uno debe abrir su checkout de Stripe.
+
+### Pendiente manual
+
+- Yo no puedo crear tus productos ni Payment Links porque dependen de tu cuenta
+  de Stripe.
+- Yo no puedo verificar los botones reales hasta que pegues las tres variables
+  de entorno en Render y redespliegues.

@@ -2,7 +2,7 @@ services:
   - type: web
     name: palacios-video-landing
     runtime: static
-    buildCommand: ""
+    buildCommand: node web/build-stripe-links.js
     staticPublishPath: ./web
     routes:
       - type: rewrite
