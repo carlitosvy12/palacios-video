@@ -1,0 +1,13 @@
+{
+  "name": "palacios-video-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "express": "^4.21.2",
+    "stripe": "^17.5.0"
+  }
+}

@@ -69,6 +69,23 @@
         font-size: 14px;
       }
 
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      select,
+      input {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 0 12px;
+        font: inherit;
+        background: #fff;
+        color: var(--ink);
+      }
+
       .btn {
         display: inline-flex;
         align-items: center;
@@ -221,6 +238,23 @@
         width: 100%;
       }
 
+      .auth-panel {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        align-items: center;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .auth-status {
+        grid-column: 1 / -1;
+        color: var(--muted);
+        min-height: 24px;
+      }
+
       footer {
         padding: 32px 0 52px;
         color: var(--muted);
@@ -233,7 +267,8 @@
 
         .hero-grid,
         .features,
-        .plans {
+        .plans,
+        .auth-panel {
           grid-template-columns: 1fr;
         }
 
@@ -248,11 +283,18 @@
       <nav class="shell" aria-label="Principal">
         <div class="brand">Palacios Video</div>
         <div class="nav-links">
-          <a href="#producto">Producto</a>
-          <a href="#planes">Planes</a>
-          <a href="#contacto">Contacto</a>
+          <a href="#producto" data-i18n="navProduct">Producto</a>
+          <a href="#planes" data-i18n="navPlans">Planes</a>
+          <a href="#cuenta" data-i18n="navAccount">Cuenta</a>
+          <a href="#contacto" data-i18n="navContact">Contacto</a>
         </div>
-        <a class="btn primary" href="#planes">Ver planes</a>
+        <div class="nav-actions">
+          <select id="languageSelect" aria-label="Idioma">
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+          </select>
+          <a class="btn primary" href="#planes" data-i18n="navCta">Ver planes</a>
+        </div>
       </nav>
     </header>
 
@@ -260,19 +302,19 @@
       <section class="hero">
         <div class="shell hero-grid">
           <div>
-            <h1>Palacios Video</h1>
-            <p class="lead">
+            <h1 data-i18n="heroTitle">Palacios Video</h1>
+            <p class="lead" data-i18n="heroLead">
               Convierte grabaciones largas en videos editados para YouTube:
               cortes limpios, subtitulos modernos, audio normalizado y metadata
               lista para publicar.
             </p>
             <div class="hero-actions">
-              <a class="btn primary" href="#planes">Empezar</a>
-              <a class="btn" href="#producto">Como funciona</a>
+              <a class="btn primary" href="#planes" data-i18n="heroPrimary">Empezar</a>
+              <a class="btn" href="#producto" data-i18n="heroSecondary">Como funciona</a>
             </div>
           </div>
           <div class="preview" aria-label="Vista previa del editor">
-            <div class="caption">CORTES LIMPIOS + SUBTITULOS</div>
+            <div class="caption" data-i18n="previewCaption">CORTES LIMPIOS + SUBTITULOS</div>
             <div class="timeline">
               <div class="bar"><span style="width: 68%"></span></div>
               <div class="bar"><span style="width: 42%"></span></div>
@@ -284,24 +326,24 @@
 
       <section id="producto">
         <div class="shell">
-          <h2>Del bruto al video publicable</h2>
-          <p class="section-copy">
+          <h2 data-i18n="productTitle">Del bruto al video publicable</h2>
+          <p class="section-copy" data-i18n="productCopy">
             Palacios Video esta pensado para creadores que graban mucho y no
             quieren perder horas limpiando silencios, muletillas y preparando
             textos para YouTube.
           </p>
           <div class="features">
             <article class="card">
-              <h3>Corte automatico</h3>
-              <p>Detecta habla util, elimina silencios largos y mantiene padding para que el resultado no suene brusco.</p>
+              <h3 data-i18n="featureCutTitle">Corte automatico</h3>
+              <p data-i18n="featureCutCopy">Detecta habla util, elimina silencios largos y mantiene padding para que el resultado no suene brusco.</p>
             </article>
             <article class="card">
-              <h3>Subtitulos integrados</h3>
-              <p>Subtitulos quemados en el video con estilo configurable y legible para redes y YouTube.</p>
+              <h3 data-i18n="featureSubsTitle">Subtitulos integrados</h3>
+              <p data-i18n="featureSubsCopy">Subtitulos quemados en el video con estilo configurable y legible para redes y YouTube.</p>
             </article>
             <article class="card">
-              <h3>Metadata de YouTube</h3>
-              <p>Titulo, descripcion y capitulos generados para acelerar la publicacion.</p>
+              <h3 data-i18n="featureMetaTitle">Metadata de YouTube</h3>
+              <p data-i18n="featureMetaCopy">Titulo, descripcion y capitulos generados para acelerar la publicacion.</p>
             </article>
           </div>
         </div>
@@ -309,38 +351,185 @@
 
       <section id="planes">
         <div class="shell">
-          <h2>Planes mensuales</h2>
-          <p class="section-copy">Precios iniciales para validar el MVP comercial.</p>
+          <h2 data-i18n="plansTitle">Planes mensuales</h2>
+          <p class="section-copy" data-i18n="plansCopy">Precios iniciales para validar el MVP comercial.</p>
           <div class="plans">
             <article class="card">
               <h3>Creator</h3>
               <div class="price">29 EUR/mes</div>
-              <p>Para creadores individuales que editan videos cortos cada semana.</p>
-              <a class="btn primary plan-action" href="#" data-stripe-plan="creator">Elegir Creator</a>
+              <p data-i18n="creatorCopy">Para creadores individuales que editan videos cortos cada semana.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="creator" data-i18n="creatorButton">Elegir Creator</a>
             </article>
             <article class="card">
               <h3>Pro</h3>
               <div class="price">79 EUR/mes</div>
-              <p>Mas horas, metadata y flujo pensado para publicar de forma constante.</p>
-              <a class="btn primary plan-action" href="#" data-stripe-plan="pro">Elegir Pro</a>
+              <p data-i18n="proCopy">Mas horas, metadata y flujo pensado para publicar de forma constante.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="pro" data-i18n="proButton">Elegir Pro</a>
             </article>
             <article class="card">
               <h3>Agencia</h3>
               <div class="price">199 EUR/mes</div>
-              <p>Para equipos que procesan contenido de varios clientes.</p>
-              <a class="btn primary plan-action" href="#" data-stripe-plan="agencia">Elegir Agencia</a>
+              <p data-i18n="agencyCopy">Para equipos que procesan contenido de varios clientes.</p>
+              <a class="btn primary plan-action" href="#" data-stripe-plan="agencia" data-i18n="agencyButton">Elegir Agencia</a>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="cuenta">
+        <div class="shell">
+          <h2 data-i18n="accountTitle">Cuenta</h2>
+          <p class="section-copy" data-i18n="accountCopy">
+            Crea una cuenta o inicia sesion antes de elegir plan. El pago se
+            asociara a tu usuario para activar limites y uso mensual.
+          </p>
+          <div class="auth-panel">
+            <input id="authEmail" type="email" placeholder="Email" autocomplete="email" />
+            <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" />
+            <button class="btn primary" id="registerButton" type="button" data-i18n="registerButton">Registrarme</button>
+            <button class="btn" id="loginButton" type="button" data-i18n="loginButton">Entrar</button>
+            <button class="btn" id="logoutButton" type="button" data-i18n="logoutButton">Salir</button>
+            <div class="auth-status" id="authStatus" data-i18n="authConfigPending">
+              Configura Supabase para activar login.
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <footer id="contacto">
-      <div class="shell">Palacios Video. MVP comercial en construccion.</div>
+      <div class="shell" data-i18n="footer">Palacios Video. MVP comercial en construccion.</div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/stripe-links.js"></script>
     <script>
-      const stripeLinks = window.PALACIOS_STRIPE_LINKS || {};
+      const translations = {
+        es: {
+          navProduct: "Producto",
+          navPlans: "Planes",
+          navAccount: "Cuenta",
+          navContact: "Contacto",
+          navCta: "Ver planes",
+          heroTitle: "Palacios Video",
+          heroLead: "Convierte grabaciones largas en videos editados para YouTube: cortes limpios, subtitulos modernos, audio normalizado y metadata lista para publicar.",
+          heroPrimary: "Empezar",
+          heroSecondary: "Como funciona",
+          previewCaption: "CORTES LIMPIOS + SUBTITULOS",
+          productTitle: "Del bruto al video publicable",
+          productCopy: "Palacios Video esta pensado para creadores que graban mucho y no quieren perder horas limpiando silencios, muletillas y preparando textos para YouTube.",
+          featureCutTitle: "Corte automatico",
+          featureCutCopy: "Detecta habla util, elimina silencios largos y mantiene padding para que el resultado no suene brusco.",
+          featureSubsTitle: "Subtitulos integrados",
+          featureSubsCopy: "Subtitulos quemados en el video con estilo configurable y legible para redes y YouTube.",
+          featureMetaTitle: "Metadata de YouTube",
+          featureMetaCopy: "Titulo, descripcion y capitulos generados para acelerar la publicacion.",
+          plansTitle: "Planes mensuales",
+          plansCopy: "Precios iniciales para validar el MVP comercial.",
+          creatorCopy: "Para creadores individuales que editan videos cortos cada semana.",
+          proCopy: "Mas horas, metadata y flujo pensado para publicar de forma constante.",
+          agencyCopy: "Para equipos que procesan contenido de varios clientes.",
+          creatorButton: "Elegir Creator",
+          proButton: "Elegir Pro",
+          agencyButton: "Elegir Agencia",
+          accountTitle: "Cuenta",
+          accountCopy: "Crea una cuenta o inicia sesion antes de elegir plan. El pago se asociara a tu usuario para activar limites y uso mensual.",
+          registerButton: "Registrarme",
+          loginButton: "Entrar",
+          logoutButton: "Salir",
+          authConfigPending: "Configura Supabase para activar login.",
+          authLoggedOut: "No has iniciado sesion.",
+          authLoggedIn: "Sesion iniciada:",
+          authCheckEmail: "Revisa tu email para confirmar la cuenta.",
+          authRequired: "Inicia sesion antes de elegir un plan.",
+          authError: "Error:",
+          footer: "Palacios Video. MVP comercial en construccion.",
+        },
+        en: {
+          navProduct: "Product",
+          navPlans: "Plans",
+          navAccount: "Account",
+          navContact: "Contact",
+          navCta: "See plans",
+          heroTitle: "Palacios Video",
+          heroLead: "Turn long recordings into edited YouTube videos: clean cuts, modern captions, normalized audio, and ready-to-publish metadata.",
+          heroPrimary: "Start",
+          heroSecondary: "How it works",
+          previewCaption: "CLEAN CUTS + CAPTIONS",
+          productTitle: "From raw footage to publishable video",
+          productCopy: "Palacios Video is built for creators who record a lot and do not want to spend hours cleaning pauses, filler words, and YouTube copy.",
+          featureCutTitle: "Automatic editing",
+          featureCutCopy: "Detects useful speech, removes long silences, and keeps padding so the result does not sound abrupt.",
+          featureSubsTitle: "Integrated captions",
+          featureSubsCopy: "Burned-in captions with configurable, readable styling for social video and YouTube.",
+          featureMetaTitle: "YouTube metadata",
+          featureMetaCopy: "Titles, descriptions, and chapters generated to speed up publishing.",
+          plansTitle: "Monthly plans",
+          plansCopy: "Initial pricing to validate the commercial MVP.",
+          creatorCopy: "For solo creators editing short videos every week.",
+          proCopy: "More hours, metadata, and a workflow for consistent publishing.",
+          agencyCopy: "For teams processing content for multiple clients.",
+          creatorButton: "Choose Creator",
+          proButton: "Choose Pro",
+          agencyButton: "Choose Agency",
+          accountTitle: "Account",
+          accountCopy: "Create an account or sign in before choosing a plan. Payment will be linked to your user for monthly limits and usage.",
+          registerButton: "Sign up",
+          loginButton: "Sign in",
+          logoutButton: "Sign out",
+          authConfigPending: "Configure Supabase to enable login.",
+          authLoggedOut: "You are signed out.",
+          authLoggedIn: "Signed in:",
+          authCheckEmail: "Check your email to confirm your account.",
+          authRequired: "Sign in before choosing a plan.",
+          authError: "Error:",
+          footer: "Palacios Video. Commercial MVP in progress.",
+        },
+      };
+
+      const config = window.PALACIOS_CONFIG || {};
+      const stripeLinks = config.stripeLinks || window.PALACIOS_STRIPE_LINKS || {};
+      let currentUser = null;
+      let supabaseClient = null;
+      let currentLanguage = localStorage.getItem("palacios_language") || "es";
+
+      function t(key) {
+        return (translations[currentLanguage] || translations.es)[key] || translations.es[key] || key;
+      }
+
+      function applyLanguage(language) {
+        currentLanguage = translations[language] ? language : "es";
+        localStorage.setItem("palacios_language", currentLanguage);
+        document.documentElement.lang = currentLanguage;
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          node.textContent = t(node.dataset.i18n);
+        });
+        document.getElementById("languageSelect").value = currentLanguage;
+        updateAuthStatus();
+      }
+
+      function updateAuthStatus(message) {
+        const status = document.getElementById("authStatus");
+        if (message) {
+          status.textContent = message;
+          return;
+        }
+        if (!supabaseClient) {
+          status.textContent = t("authConfigPending");
+          return;
+        }
+        status.textContent = currentUser
+          ? `${t("authLoggedIn")} ${currentUser.email}`
+          : t("authLoggedOut");
+      }
+
+      function checkoutUrl(baseUrl) {
+        const url = new URL(baseUrl);
+        if (currentUser) {
+          url.searchParams.set("client_reference_id", currentUser.id);
+          url.searchParams.set("prefilled_email", currentUser.email || "");
+        }
+        return url.toString();
+      }
 
       document.querySelectorAll("[data-stripe-plan]").forEach((button) => {
         const plan = button.dataset.stripePlan;
@@ -349,6 +538,16 @@
         if (url) {
           button.href = url;
           button.rel = "noopener";
+          button.addEventListener("click", (event) => {
+            if (!currentUser) {
+              event.preventDefault();
+              updateAuthStatus(t("authRequired"));
+              document.getElementById("cuenta").scrollIntoView({ behavior: "smooth" });
+              return;
+            }
+            event.preventDefault();
+            window.location.href = checkoutUrl(url);
+          });
         } else {
           button.href = "#planes";
           button.classList.add("disabled");
@@ -356,6 +555,47 @@
           button.title = "Payment Link pendiente de configurar en Render";
         }
       });
+
+      document.getElementById("languageSelect").addEventListener("change", (event) => {
+        applyLanguage(event.target.value);
+      });
+
+      if (config.supabaseUrl && config.supabaseAnonKey && window.supabase) {
+        supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+
+        supabaseClient.auth.getSession().then(({ data }) => {
+          currentUser = data.session?.user || null;
+          updateAuthStatus();
+        });
+
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+          currentUser = session?.user || null;
+          updateAuthStatus();
+        });
+      }
+
+      document.getElementById("registerButton").addEventListener("click", async () => {
+        if (!supabaseClient) return updateAuthStatus(t("authConfigPending"));
+        const email = document.getElementById("authEmail").value;
+        const password = document.getElementById("authPassword").value;
+        const { error } = await supabaseClient.auth.signUp({ email, password });
+        updateAuthStatus(error ? `${t("authError")} ${error.message}` : t("authCheckEmail"));
+      });
+
+      document.getElementById("loginButton").addEventListener("click", async () => {
+        if (!supabaseClient) return updateAuthStatus(t("authConfigPending"));
+        const email = document.getElementById("authEmail").value;
+        const password = document.getElementById("authPassword").value;
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) updateAuthStatus(`${t("authError")} ${error.message}`);
+      });
+
+      document.getElementById("logoutButton").addEventListener("click", async () => {
+        if (!supabaseClient) return updateAuthStatus(t("authConfigPending"));
+        await supabaseClient.auth.signOut();
+      });
+
+      applyLanguage(currentLanguage);
     </script>
   </body>
 </html>

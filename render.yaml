@@ -8,3 +8,29 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: STRIPE_LINK_CREATOR
+        sync: false
+      - key: STRIPE_LINK_PRO
+        sync: false
+      - key: STRIPE_LINK_AGENCIA
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+  - type: web
+    name: palacios-video-api
+    runtime: node
+    plan: free
+    buildCommand: cd api && npm install
+    startCommand: cd api && npm start
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

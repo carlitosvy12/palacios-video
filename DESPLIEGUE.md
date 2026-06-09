@@ -166,3 +166,193 @@ Guarda cada enlace con esta correspondencia:
   de Stripe.
 - Yo no puedo verificar los botones reales hasta que pegues las tres variables
   de entorno en Render y redespliegues.
+
+## Fase 3 - Supabase Auth, base de datos y webhook de Stripe
+
+### Que se ha preparado en el repo
+
+- `supabase/schema.sql`: tablas de suscripciones y uso mensual.
+- Login y registro con Supabase Auth en `web/palacios-video-landing.html`.
+- Selector de idioma ES/EN en la landing.
+- `api/server.js`: endpoint `POST /stripe/webhook` para recibir eventos de
+  Stripe y actualizar Supabase.
+- `api/package.json`: dependencias del backend.
+- `render.yaml`: servicio adicional `palacios-video-api`.
+
+### Importante sobre Stripe
+
+Para asociar un pago a un usuario:
+
+1. El usuario debe iniciar sesion en la landing antes de elegir plan.
+2. La landing manda `client_reference_id` a Stripe con el `user_id` de Supabase.
+3. Cada Payment Link debe tener metadata:
+   - `plan=creator`
+   - `plan=pro`
+   - `plan=agencia`
+
+Sin esa metadata, el webhook recibe el pago pero no sabe que plan activar.
+
+### Crear proyecto en Supabase
+
+1. Entra en https://supabase.com
+2. Inicia sesion o crea una cuenta.
+3. Pulsa `New project`.
+4. Elige tu organizacion.
+5. Rellena:
+   - `Project name`: `palacios-video`
+   - `Database Password`: genera una contrasena fuerte y guardala.
+   - `Region`: elige la mas cercana a tus usuarios.
+6. Pulsa `Create new project`.
+7. Espera a que Supabase termine de crear el proyecto.
+
+### Ejecutar el schema SQL
+
+1. Entra en tu proyecto de Supabase.
+2. En el menu lateral, pulsa `SQL Editor`.
+3. Pulsa `New query`.
+4. Abre en tu ordenador el archivo:
+   `supabase/schema.sql`
+5. Copia todo el contenido.
+6. Pegalo en el editor SQL de Supabase.
+7. Pulsa `Run`.
+8. Comprueba que se crean estas tablas:
+   - `suscripciones`
+   - `uso_mensual`
+
+### Sacar las claves de Supabase
+
+1. En Supabase, entra en `Project Settings`.
+2. Entra en `API`.
+3. Copia:
+   - `Project URL` -> sera `SUPABASE_URL`
+   - `anon public` -> sera `SUPABASE_ANON_KEY`
+   - `service_role` -> sera `SUPABASE_SERVICE_ROLE_KEY`
+
+Nunca pegues `service_role` en el codigo ni en la landing. Solo va en el
+backend `palacios-video-api`.
+
+### Meter variables de Supabase en Render
+
+En Render tienes dos servicios:
+
+- `palacios-video-landing`
+- `palacios-video-api`
+
+#### Variables para `palacios-video-landing`
+
+1. Render -> abre `palacios-video-landing`.
+2. Entra en `Environment`.
+3. Anade:
+   - `SUPABASE_URL` = pega `Project URL`
+   - `SUPABASE_ANON_KEY` = pega `anon public`
+4. Guarda.
+
+#### Variables para `palacios-video-api`
+
+1. Render -> abre `palacios-video-api`.
+2. Entra en `Environment`.
+3. Anade:
+   - `SUPABASE_URL` = pega `Project URL`
+   - `SUPABASE_SERVICE_ROLE_KEY` = pega `service_role`
+4. Guarda.
+
+### Crear o actualizar el servicio API en Render
+
+Si usas Blueprint:
+
+1. Haz `git push`.
+2. Render deberia detectar el nuevo servicio `palacios-video-api`.
+3. Aplica los cambios del Blueprint.
+
+Si lo creas manualmente:
+
+1. Render -> `New +`.
+2. Elige `Web Service`.
+3. Selecciona el mismo repo.
+4. Rellena:
+   - `Name`: `palacios-video-api`
+   - `Runtime`: `Node`
+   - `Build Command`: `cd api && npm install`
+   - `Start Command`: `cd api && npm start`
+5. Crea el servicio.
+6. Mete las variables indicadas arriba.
+
+Cuando este desplegado, Render te dara una URL como:
+
+`https://palacios-video-api.onrender.com`
+
+Comprueba que funciona abriendo:
+
+`https://palacios-video-api.onrender.com/health`
+
+Debe responder algo parecido a:
+
+`{"ok":true,"service":"palacios-video-api"}`
+
+### Variables de Stripe para `palacios-video-api`
+
+1. En Stripe, entra en `Developers`.
+2. Entra en `API keys`.
+3. Copia `Secret key`.
+4. En Render -> `palacios-video-api` -> `Environment`, anade:
+   - `STRIPE_SECRET_KEY` = pega la secret key de Stripe.
+
+### Configurar webhook en Stripe
+
+1. En Stripe, entra en `Developers`.
+2. Entra en `Webhooks`.
+3. Pulsa `Add endpoint`.
+4. En `Endpoint URL`, pega:
+   `https://palacios-video-api.onrender.com/stripe/webhook`
+5. En eventos, selecciona:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+6. Pulsa `Add endpoint`.
+7. En la pagina del webhook, busca `Signing secret`.
+8. Pulsa `Reveal`.
+9. Copia el valor.
+10. En Render -> `palacios-video-api` -> `Environment`, anade:
+    - `STRIPE_WEBHOOK_SECRET` = pega el signing secret.
+11. Guarda y redeploya `palacios-video-api`.
+
+### Anadir metadata plan a los Payment Links
+
+Para cada Payment Link:
+
+1. Stripe -> `Payment Links`.
+2. Abre el Payment Link de Creator.
+3. Entra en opciones avanzadas o metadata.
+4. Anade metadata:
+   - `plan`: `creator`
+5. Guarda.
+6. Repite:
+   - Pro -> `plan`: `pro`
+   - Agencia -> `plan`: `agencia`
+
+### Redesplegar todo
+
+1. Haz `git push`.
+2. En Render, redeploya `palacios-video-landing`.
+3. En Render, redeploya `palacios-video-api`.
+4. Abre la landing.
+5. Crea una cuenta en la seccion `Cuenta`.
+6. Confirma el email si Supabase lo exige.
+7. Inicia sesion.
+8. Pulsa un plan.
+9. Completa un pago de prueba en Stripe.
+10. En Supabase, abre `Table Editor` -> `suscripciones`.
+11. Verifica que aparece una fila con:
+    - `user_id`
+    - `plan`
+    - `stripe_customer_id`
+    - `estado`
+    - `horas_limite`
+    - `renovacion`
+
+### Pendiente manual
+
+- Yo no puedo crear tu proyecto Supabase ni ejecutar el SQL en tu cuenta.
+- Yo no puedo copiar tus claves de Stripe o Supabase.
+- Yo no puedo verificar un pago real hasta que configures el webhook y hagas
+  un checkout de prueba.
