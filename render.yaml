@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: palacios-video-landing
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
