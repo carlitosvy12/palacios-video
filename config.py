@@ -48,6 +48,12 @@ class Config:
     subtitulos_chars_max: int = 22
     subtitulos_hueco_max: float = 0.35
 
+    # --- Audio ---
+    normalizar_audio: bool = True
+    loudnorm_i: float = -16.0
+    loudnorm_lra: float = 11.0
+    loudnorm_tp: float = -1.5
+
     # --- Capa narrativa (LLM) ---
     # Sonnet por defecto: buen balance coste/calidad para analizar transcripts
     # largos. Opus solo si necesitas mas calidad y te sobra presupuesto.

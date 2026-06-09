@@ -36,10 +36,18 @@ def renderizar(
             f":force_style='{_estilo_subtitulos(cfg)}'"
         )
 
+    cfg = cfg or Config()
+    audio_filter = f"aselect='{expr}',asetpts=N/SR/TB"
+    if cfg.normalizar_audio:
+        audio_filter += (
+            f",loudnorm=I={cfg.loudnorm_i}:"
+            f"LRA={cfg.loudnorm_lra}:TP={cfg.loudnorm_tp}"
+        )
+
     cmd = [
         _ffmpeg(), "-y", "-i", ruta_entrada,
         "-vf", video_filter,
-        "-af", f"aselect='{expr}',asetpts=N/SR/TB",
+        "-af", audio_filter,
         "-c:v", "libx264", "-preset", "fast", "-pix_fmt", "yuv420p",
         "-profile:v", "high", "-movflags", "+faststart", "-c:a", "aac",
         ruta_salida,

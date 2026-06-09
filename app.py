@@ -27,8 +27,8 @@ def procesar(
     cfg.padding = float(padding)
     cfg.subtitulos = bool(subtitulos)
 
-    def estado(mensaje: str):
-        progress(0, desc=mensaje)
+    def estado(valor: float, mensaje: str):
+        progress(valor, desc=mensaje)
 
     try:
         resultado = editar_video(video, cfg, usar_llm=bool(narrativa), progreso=estado)

@@ -19,10 +19,10 @@ def editar_video(
     if not entrada.exists():
         raise FileNotFoundError(f"No existe el archivo: {entrada}")
 
-    _progreso(progreso, "Transcribiendo el video...")
+    _progreso(progreso, 0.05, "Transcribiendo el video...")
     datos = transcribir(str(entrada), cfg)
 
-    _progreso(progreso, "Calculando cortes...")
+    _progreso(progreso, 0.35, "Calculando cortes...")
     intervalos = cortar.construir_intervalos(datos["palabras"], cfg)
     if not intervalos:
         raise RuntimeError("No se detecto habla utilizable.")
@@ -33,18 +33,18 @@ def editar_video(
 
     narrativa = {}
     if usar_llm:
-        _progreso(progreso, "Generando metadata de YouTube...")
+        _progreso(progreso, 0.45, "Generando metadata de YouTube...")
         from motor.narrativa import analizar_narrativa
 
         narrativa = analizar_narrativa(datos["segmentos"], cfg)
 
     ruta_subtitulos = None
     if cfg.subtitulos:
-        _progreso(progreso, "Generando subtitulos...")
+        _progreso(progreso, 0.60, "Generando subtitulos...")
         ruta_subtitulos = entrada.with_name(f"{entrada.stem}_subtitulos.srt")
         generar_srt(datos["palabras"], intervalos, str(ruta_subtitulos), cfg)
 
-    _progreso(progreso, "Renderizando el video final...")
+    _progreso(progreso, 0.75, "Renderizando y normalizando audio...")
     salida = entrada.with_name(f"{entrada.stem}_editado.mp4")
     render.renderizar(
         str(entrada),
@@ -57,7 +57,7 @@ def editar_video(
     ruta_youtube = None
     capitulos = ""
     if narrativa and "error" not in narrativa:
-        _progreso(progreso, "Guardando metadata de YouTube...")
+        _progreso(progreso, 0.95, "Guardando metadata de YouTube...")
         ruta_youtube = entrada.with_name(f"{entrada.stem}_youtube.txt")
         capitulos = render.formato_capitulos_youtube(narrativa.get("capitulos", []))
         contenido = (
@@ -67,7 +67,7 @@ def editar_video(
         )
         ruta_youtube.write_text(contenido, encoding="utf-8")
 
-    _progreso(progreso, "Listo.")
+    _progreso(progreso, 1.0, "Listo.")
     return {
         "salida": salida,
         "subtitulos": ruta_subtitulos,
@@ -81,6 +81,9 @@ def editar_video(
     }
 
 
-def _progreso(callback, mensaje: str) -> None:
+def _progreso(callback, valor: float, mensaje: str) -> None:
     if callback:
-        callback(mensaje)
+        try:
+            callback(valor, mensaje)
+        except TypeError:
+            callback(mensaje)
