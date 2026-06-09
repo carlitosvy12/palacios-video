@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secretos
+.env
+
+# Videos (no subir material pesado/privado al repo)
+*.mp4
+*.mov
+*.mkv
+*_editado.mp4
+*_youtube.txt
+*_subtitulos.ass
+*_subtitulos.srt
+
+# Modelos descargados por faster-whisper
+models/
