@@ -36,13 +36,13 @@ class Config:
     # ffmpeg. Estilo moderno: blanco, borde negro y abajo-centro.
     subtitulos: bool = True
     subtitulos_fuente: str = "Arial Black"
-    subtitulos_tamano: int = 76
+    subtitulos_tamano: int = 34
     subtitulos_color_texto: str = "#FFFFFF"
     subtitulos_color_borde: str = "#000000"
     subtitulos_posicion: str = "abajo-centro"
-    subtitulos_contorno: int = 6
-    subtitulos_sombra: int = 2
-    subtitulos_margen_v: int = 190
+    subtitulos_contorno: int = 3
+    subtitulos_sombra: int = 1
+    subtitulos_margen_v: int = 70
     subtitulos_palabras_max: int = 3
     subtitulos_duracion_max: float = 1.15
     subtitulos_chars_max: int = 22
