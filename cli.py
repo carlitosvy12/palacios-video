@@ -14,14 +14,11 @@ Salidas (junto al video original):
 """
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
 from config import Config
-from motor import cortar, render
-from motor.subtitulos import generar_srt
-from motor.transcribir import transcribir
+from motor.pipeline import editar_video
 
 
 def main():
@@ -47,62 +44,33 @@ def main():
     if not entrada.exists():
         sys.exit(f"No existe el archivo: {entrada}")
 
-    # 1. Transcribir
-    datos = transcribir(str(entrada), cfg)
+    try:
+        resultado = editar_video(str(entrada), cfg, usar_llm=not args.sin_llm)
+    except (FileNotFoundError, RuntimeError) as exc:
+        sys.exit(str(exc))
 
-    # 2. Cortar (logica pura)
-    intervalos = cortar.construir_intervalos(datos["palabras"], cfg)
-    if not intervalos:
-        sys.exit("No se detecto habla utilizable.")
-
-    dur_orig = datos["duracion"]
-    dur_final = cortar.duracion_total(intervalos)
-    ahorro = (1 - dur_final / dur_orig) * 100 if dur_orig else 0
+    dur_orig = resultado["duracion_original"]
+    dur_final = resultado["duracion_final"]
+    ahorro = resultado["ahorro"]
     print(f"\n  Original: {dur_orig:7.1f}s")
     print(f"  Editado : {dur_final:7.1f}s")
-    print(f"  Recorte : {ahorro:6.1f}%  ({len(intervalos)} segmentos)\n")
+    print(f"  Recorte : {ahorro:6.1f}%  ({resultado['segmentos']} segmentos)\n")
 
-    # 3. Capa narrativa (opcional)
-    narrativa = {}
-    if not args.sin_llm:
-        from motor.narrativa import analizar_narrativa
-        narrativa = analizar_narrativa(datos["segmentos"], cfg)
+    if resultado["subtitulos"]:
+        print(f"  Subtitulos -> {resultado['subtitulos']}")
+
+    narrativa = resultado["narrativa"]
+    if narrativa:
         if "error" in narrativa:
             print(f"  [aviso] {narrativa['error']}")
-
-    # 4. Render
-    salida = entrada.with_name(f"{entrada.stem}_editado.mp4")
-    ruta_subtitulos = None
-    if cfg.subtitulos:
-        ruta_subtitulos = entrada.with_name(f"{entrada.stem}_subtitulos.srt")
-        generar_srt(datos["palabras"], intervalos, str(ruta_subtitulos), cfg)
-        print(f"  Subtitulos -> {ruta_subtitulos}")
-
-    render.renderizar(
-        str(entrada),
-        intervalos,
-        str(salida),
-        str(ruta_subtitulos) if ruta_subtitulos else None,
-        cfg,
-    )
-
-    # 5. Metadata para YouTube
-    if narrativa and "error" not in narrativa:
-        txt = entrada.with_name(f"{entrada.stem}_youtube.txt")
-        capitulos = render.formato_capitulos_youtube(narrativa.get("capitulos", []))
-        contenido = (
-            f"TITULO:\n{narrativa.get('titulo', '')}\n\n"
-            f"DESCRIPCION:\n{narrativa.get('descripcion', '')}\n\n"
-            f"CAPITULOS:\n{capitulos}\n"
-        )
-        txt.write_text(contenido, encoding="utf-8")
-        print(f"  Metadata YouTube -> {txt}")
-        if narrativa.get("secciones_flojas"):
+        elif resultado["youtube"]:
+            print(f"  Metadata YouTube -> {resultado['youtube']}")
+        if "error" not in narrativa and narrativa.get("secciones_flojas"):
             print("\n  Secciones flojas detectadas (revisa si recortar):")
             for s in narrativa["secciones_flojas"]:
                 print(f"    [{s['inicio']:.0f}-{s['fin']:.0f}s] {s['motivo']}")
 
-    print(f"\nListo: {salida}")
+    print(f"\nListo: {resultado['salida']}")
 
 
 if __name__ == "__main__":
